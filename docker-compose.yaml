@@ -1,0 +1,72 @@
+services:
+  event-service:
+    build:
+      context: ./events-service
+      dockerfile: Dockerfile
+    image: java-event-service
+    restart: always
+    depends_on:
+      - event-db
+      - registry
+      - gateway
+    ports:
+      - "7003:7003"
+
+  booking-service:
+    build:
+      context: ./booking-service
+      dockerfile: Dockerfile
+    image: java-booking-service
+    restart: always
+    depends_on:
+      - booking-db
+      - registry
+      - gateway
+    ports:
+      - "7004:7004"
+
+  registry:
+    build:
+      context: ./registry-service
+      dockerfile: Dockerfile
+    image: java-registry-service
+    restart: always
+    ports:
+      - "7002:7002"
+
+  gateway:
+    build:
+      context: ./gateway-service
+      dockerfile: Dockerfile
+    image: java-gateway-service
+    restart: always
+    ports:
+      - "7001:7001"
+
+  event-db:
+    image: postgres
+    ports:
+      - 9433:5432
+    environment:
+      - POSTGRES_PASSWORD=root
+      - POSTGRES_USER=marius
+      - POSTGRES_DB=event_db
+    restart: always
+    volumes:
+      - event_db_data:/var/lib/pgsql/data
+
+  booking-db:
+    image: postgres
+    ports:
+      - 9432:5432
+    environment:
+      - POSTGRES_PASSWORD=root
+      - POSTGRES_USER=marius
+      - POSTGRES_DB=booking_db
+    restart: always
+    volumes:
+      - booking_db_data:/var/lib/pgsql/data
+
+volumes:
+  event_db_data:
+  booking_db_data:
